@@ -153,4 +153,29 @@ Begin
     ON p.product_ID = i.product_ID;
 End;
 
+create trigger Restore_Stock_Before_Delete
+on Order_Items301
+instead of delete
+as
+begin
+    update p
+    set p.stock = p.stock + d.quantity
+    from Products301 p
+    inner join deleted d
+    on p.product_ID = d.product_ID;
+
+    delete from Order_Items301
+    where order_item_ID in (
+        select order_item_ID from deleted
+    );
+end;
+
 SELECT product_Name, stock FROM Products301 WHERE product_ID = 1;
+
+-- for delete trigger
+
+select * from Order_Items301
+
+DELETE FROM Order_Items301
+WHERE order_item_ID = 3;
+
